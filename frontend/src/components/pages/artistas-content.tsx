@@ -18,44 +18,8 @@ export function ArtistasContent() {
   const loadArtists = useCallback(async () => {
     try {
       const responseRes = await apiClient.getTopArtists(20);
-      const response = {
-        success: true,
-        data: {
-          items: [] as Artist[],
-          limit: 20,
-          next: null,
-          offset: 0,
-          previous: null,
-          total: 1,
-        },
-      } as const; // Simulando a resposta da API
-      if (response.success && response.data) {
-        const items = [
-          {
-            external_urls: {
-              spotify: "string",
-            },
-            followers: {
-              href: "string",
-              total: 0,
-            },
-            genres: ["Prog rock", "Grunge"],
-            href: "string",
-            id: "096an3uS6ZaK2XySae6SqP",
-            images: [
-              {
-                url: "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
-                height: 300,
-                width: 300,
-              },
-            ],
-            name: "Arlindo Cruz",
-            popularity: 0,
-            type: "artist",
-            uri: "string",
-          },
-        ];
-        setArtists(items || []);
+      if (responseRes.success && responseRes.data) {
+        setArtists(responseRes.data.items || []);
       }
     } catch (error) {
       console.error("Error loading artists:", error);

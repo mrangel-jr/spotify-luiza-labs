@@ -14,25 +14,8 @@ interface Album {
   album_type: string;
 }
 
-interface Artist {
-  id: string;
-  name: string;
-  images: Array<{ url: string }>;
-  followers: {
-    total: number;
-  };
-  genres: string[];
-}
-
-interface ArtistDetailsPageProps {
-  artistId: string;
-  artistName?: string;
-  initialAlbums: Album[];
-}
-
 export default function ArtistPageClient() {
   const { isAuthenticated } = useAuth();
-  const [artist, setArtist] = useState<Artist | null>(null);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -107,17 +90,6 @@ export default function ArtistPageClient() {
                   {artistName || "Carregando..."}
                 </h1>
               </div>
-
-              {/* Imagem do artista no canto superior direito */}
-              {artist && artist.images && artist.images[0] && (
-                <div className="w-16 h-16 rounded-full overflow-hidden">
-                  <img
-                    src={artist.images[0].url}
-                    alt={artist.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
             </div>
           </div>
 
