@@ -47,8 +47,10 @@ export default function ArtistPageClient() {
       } else {
         setError("Erro ao carregar os álbuns do artista.");
       }
-    } catch (err) {
-      setError("Erro ao carregar os álbuns do artista.");
+    } catch (error) {
+      setError(
+        "Erro ao carregar os álbuns do artista. " + (error as Error).message
+      );
     } finally {
       setIsLoading(false);
     }

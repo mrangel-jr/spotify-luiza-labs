@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { SidebarIcon } from "../ui/sidebar-icon";
 
 export default function InstallPWA() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstall, setShowInstall] = useState(false);
 

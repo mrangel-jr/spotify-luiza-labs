@@ -62,6 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
       }
     } catch (error) {
+      console.error("Erro ao verificar status de autenticação:", error);
       setAuthState({
         isAuthenticated: false,
         user: null,

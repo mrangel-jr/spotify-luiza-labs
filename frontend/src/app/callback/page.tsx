@@ -3,9 +3,9 @@
 import { useAuth } from "@/providers/auth-provider";
 import { useSearchParams } from "next/navigation";
 import router from "next/router";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
-export default function CallbackPage() {
+function CallbackHandler() {
   const searchParams = useSearchParams();
   const { handleCallback } = useAuth();
 
@@ -37,7 +37,7 @@ export default function CallbackPage() {
     };
 
     processCallback();
-  }, [searchParams, handleCallback, router]);
+  }, [searchParams, handleCallback]);
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
@@ -52,5 +52,13 @@ export default function CallbackPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function CallbackPage() {
+  return (
+    <Suspense fallback={<div className="text-white">Carregando...</div>}>
+      <CallbackHandler />
+    </Suspense>
   );
 }
