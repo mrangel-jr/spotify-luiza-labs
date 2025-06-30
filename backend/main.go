@@ -16,8 +16,14 @@ func main() {
 	godotenv.Load()
 
 	r := chi.NewRouter()
+
+	corsOrigins := []string{
+		"http://localhost:3000",   // dev local
+		"https://localhost:3000",  // dev local https
+		os.Getenv("FRONTEND_URL"), // produção
+	}
 	corsMiddleware := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:3000"},
+		AllowedOrigins: corsOrigins,
 
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 
