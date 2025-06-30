@@ -23,3 +23,20 @@ autenticação OAuth2 e endpoints para usuários, artistas, playlists e álbuns.
 ```
 
 # Instruções de Uso
+
+1. **Instale as dependências**:
+   ```bash
+   go mod tidy
+   ```
+2. **Configure as variáveis de ambiente**:
+   Crie um arquivo `.env` com as seguintes variáveis:
+   ```env
+   SPOTIFY_CLIENT_ID=seu_client_id
+   SPOTIFY_CLIENT_SECRET=seu_client_secret
+   SPOTIFY_REDIRECT_URI=http://localhost:8080/callback
+   PORT=8080
+   ```
+3. **Execute o servidor**:
+   ```bash
+   go run main.go
+   ```
