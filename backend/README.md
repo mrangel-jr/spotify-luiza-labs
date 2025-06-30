@@ -37,6 +37,11 @@ autenticação OAuth2 e endpoints para usuários, artistas, playlists e álbuns.
    PORT=8080
    ```
 3. **Execute o servidor**:
+
    ```bash
    go run main.go
    ```
+
+4. **Deploy do ambiente**:
+   O deploy do ambiente foi feito no Render, e você pode acessar a API através do seguinte link:
+   - [https://spotify-luiza-labs.onrender.com](https://spotify-luiza-labs.onrender.com)
