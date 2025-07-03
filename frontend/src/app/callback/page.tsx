@@ -1,18 +1,20 @@
 "use client";
 
 import { useAuth } from "@/providers/auth-provider";
-import { useSearchParams } from "next/navigation";
-import router from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
 function CallbackHandler() {
   const searchParams = useSearchParams();
+  const router = useRouter(); // Corrigido: usar useRouter de next/navigation
   const { handleCallback } = useAuth();
 
   useEffect(() => {
     const processCallback = async () => {
       try {
-        const token = searchParams.get("token");
+        // Corrigido: buscar 'code' e 'state' em vez de 'token'
+        const code = searchParams.get("code");
+        const state = searchParams.get("state");
         const error = searchParams.get("error");
 
         if (error) {
@@ -21,23 +23,49 @@ function CallbackHandler() {
           return;
         }
 
-        // Verificar se o token está presente
-        if (!token) {
-          alert("Erro: token não encontrado");
-          router.push("/?error=no_token");
+        // Verificar se o code está presente
+        if (!code) {
+          alert("Erro: código de autorização não encontrado");
+          router.push("/?error=no_code");
           return;
         }
 
-        // Chamar função simplificada do AuthProvider
-        await handleCallback(token);
+        if (!state) {
+          alert("Erro: state não encontrado");
+          router.push("/?error=no_state");
+          return;
+        }
+
+        // Enviar code e state para o backend
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/callback`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ code, state }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Erro na resposta: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Agora sim, usar o token retornado pelo backend
+        await handleCallback(data.access_token || data.token);
       } catch (error) {
+        console.error("Erro no processamento:", error);
         alert("Erro no processamento: " + (error as Error).message);
         router.push("/?error=callback_failed");
       }
     };
 
     processCallback();
-  }, [searchParams, handleCallback]);
+  }, [searchParams, handleCallback, router]);
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
@@ -57,7 +85,13 @@ function CallbackHandler() {
 
 export default function CallbackPage() {
   return (
-    <Suspense fallback={<div className="text-white">Carregando...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-white">Carregando...</div>
+        </div>
+      }
+    >
       <CallbackHandler />
     </Suspense>
   );
