@@ -10,7 +10,7 @@ import (
 )
 
 func TopArtists(w http.ResponseWriter, r *http.Request) {
-	artists, err := spotify.GetTopArtists(getToken(r), "short_term", 10, 0)
+	artists, err := spotify.GetTopArtists(r, "short_term", 10, 0)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -20,7 +20,7 @@ func TopArtists(w http.ResponseWriter, r *http.Request) {
 
 func ArtistAlbums(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	albums, err := spotify.GetArtistAlbums(getToken(r), id, "album,single", "US", 10)
+	albums, err := spotify.GetArtistAlbums(r, id, "album,single", "US", 10)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

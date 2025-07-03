@@ -7,18 +7,23 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"spotify-luiza-labs/middleware"
 	"strings"
 )
 
 const baseURL = "https://api.spotify.com/v1"
 
-func doRequest[T any](token, method, url string, body io.Reader) (*T, error) {
+func doRequest[T any](r *http.Request, method, url string, body io.Reader) (*T, error) {
 	req, _ := http.NewRequest(method, url, body)
 	var authHeader string
-	if strings.HasPrefix(token, "Bearer ") {
-		authHeader = token
+	if token := middleware.GetToken(r); token == "" {
+		return nil, fmt.Errorf("no valid token found")
 	} else {
-		authHeader = "Bearer " + token
+		if strings.HasPrefix(token, "Bearer ") {
+			authHeader = token
+		} else {
+			authHeader = "Bearer " + token
+		}
 	}
 	req.Header.Set("Authorization", authHeader)
 	resp, err := http.DefaultClient.Do(req)
@@ -37,8 +42,8 @@ func doRequest[T any](token, method, url string, body io.Reader) (*T, error) {
 // Spotify API Client
 
 // --- 1. Get Current User's Profile ---
-func GetCurrentUserProfile(token string) (map[string]interface{}, error) {
-	result, err := doRequest[map[string]interface{}](token, "GET", baseURL+"/me", nil)
+func GetCurrentUserProfile(r *http.Request) (map[string]interface{}, error) {
+	result, err := doRequest[map[string]interface{}](r, "GET", baseURL+"/me", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -49,9 +54,9 @@ func GetCurrentUserProfile(token string) (map[string]interface{}, error) {
 }
 
 // --- 2. Get Top Artists ---
-func GetTopArtists(token, timeRange string, limit, offset int) (map[string]interface{}, error) {
+func GetTopArtists(r *http.Request, timeRange string, limit, offset int) (map[string]interface{}, error) {
 	u := fmt.Sprintf("%s/me/top/artists?time_range=%s&limit=%d&offset=%d", baseURL, url.QueryEscape(timeRange), limit, offset)
-	result, err := doRequest[map[string]interface{}](token, "GET", u, nil)
+	result, err := doRequest[map[string]interface{}](r, "GET", u, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -62,9 +67,9 @@ func GetTopArtists(token, timeRange string, limit, offset int) (map[string]inter
 }
 
 // --- 3. Get Artist's Albums ---
-func GetArtistAlbums(token, artistID, includeGroups, market string, limit int) (map[string]interface{}, error) {
+func GetArtistAlbums(r *http.Request, artistID, includeGroups, market string, limit int) (map[string]interface{}, error) {
 	u := fmt.Sprintf("%s/artists/%s/albums?include_groups=%s&market=%s&limit=%d", baseURL, artistID, url.QueryEscape(includeGroups), market, limit)
-	result, err := doRequest[map[string]interface{}](token, "GET", u, nil)
+	result, err := doRequest[map[string]interface{}](r, "GET", u, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +80,9 @@ func GetArtistAlbums(token, artistID, includeGroups, market string, limit int) (
 }
 
 // --- 4. Get User's Playlists ---
-func GetUserPlaylists(token string, limit, offset int) (map[string]interface{}, error) {
+func GetUserPlaylists(r *http.Request, limit, offset int) (map[string]interface{}, error) {
 	u := fmt.Sprintf("%s/me/playlists?limit=%d&offset=%d", baseURL, limit, offset)
-	result, err := doRequest[map[string]interface{}](token, "GET", u, nil)
+	result, err := doRequest[map[string]interface{}](r, "GET", u, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +92,7 @@ func GetUserPlaylists(token string, limit, offset int) (map[string]interface{}, 
 	return *result, nil
 }
 
-func CreatePlaylist(token, userID, name string, public bool) (map[string]interface{}, error) {
+func CreatePlaylist(r *http.Request, userID, name string, public bool) (map[string]interface{}, error) {
 	type CreatePlaylistBody struct {
 		Name   string `json:"name"`
 		Public bool   `json:"public"`
@@ -98,7 +103,7 @@ func CreatePlaylist(token, userID, name string, public bool) (map[string]interfa
 	if err != nil {
 		return nil, err
 	}
-	result, err := doRequest[map[string]interface{}](token, "POST", u, bytes.NewReader(bodyBytes))
+	result, err := doRequest[map[string]interface{}](r, "POST", u, bytes.NewReader(bodyBytes))
 	if err != nil {
 		return nil, err
 	}

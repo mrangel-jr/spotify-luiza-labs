@@ -8,7 +8,7 @@ import (
 )
 
 func ListPlaylists(w http.ResponseWriter, r *http.Request) {
-	playlists, err := spotify.GetUserPlaylists(getToken(r), 10, 0)
+	playlists, err := spotify.GetUserPlaylists(r, 10, 0)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -23,7 +23,7 @@ func CreatePlaylist(w http.ResponseWriter, r *http.Request) {
 		UserID string `json:"user_id"`
 	}
 	json.NewDecoder(r.Body).Decode(&body)
-	result, err := spotify.CreatePlaylist(getToken(r), body.UserID, body.Name, body.Public)
+	result, err := spotify.CreatePlaylist(r, body.UserID, body.Name, body.Public)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

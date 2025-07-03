@@ -8,7 +8,7 @@ import (
 )
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	profile, err := spotify.GetCurrentUserProfile(getToken(r))
+	profile, err := spotify.GetCurrentUserProfile(r)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
